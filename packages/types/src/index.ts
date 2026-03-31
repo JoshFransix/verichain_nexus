@@ -13,3 +13,25 @@ export interface Transaction {
 }
 
 export type Status = 'pending' | 'completed' | 'failed';
+
+export interface Agent {
+  id: number;
+  name: string;
+  description: string;
+  endpoint: string;
+  capabilities: string[];
+  owner: string;
+  isActive: boolean;
+  createdAt: number;
+}
+
+export interface RegisterAgentParams {
+  name: string;
+  description: string;
+  endpoint: string;
+  capabilities: string[];
+}
+
+export interface UpdateAgentParams extends RegisterAgentParams {
+  id: number;
+}

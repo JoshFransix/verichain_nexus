@@ -1,104 +1,59 @@
 # VeriChain Nexus
 
-A clean, scalable Nx monorepo for blockchain development with Next.js, NestJS, and Hardhat.
+Nx monorepo with Next.js, NestJS, and Hardhat.
 
 ## Structure
 
 ```
-verichain-nexus/
-├── apps/
-│   ├── web/           # Next.js frontend (App Router, TypeScript)
-│   ├── api/           # NestJS backend (TypeScript)
-│   ├── web-e2e/       # E2E tests for web
-│   └── api-e2e/       # E2E tests for api
-├── packages/
-│   ├── contracts/     # Solidity smart contracts (Hardhat)
-│   └── types/         # Shared TypeScript types
-└── nx.json            # Nx workspace configuration
+apps/
+  web/           - Next.js frontend
+  api/           - NestJS backend
+packages/
+  contracts/     - Solidity contracts (Hardhat)
+  types/         - Shared TypeScript types
 ```
 
-## Quick Start
-
-### Install Dependencies
-
-```bash
-npm install
-```
+## Commands
 
 ### Development
 
-**Simple Commands:**
-
 ```bash
-# Start Next.js frontend
-npm run web
-
-# Start NestJS backend
-npm run api
-
-# Start both frontend + backend together
-npm run dev
-
-# Compile smart contracts
-npm run contracts:compile
-```
-
-**Alternative (full Nx commands):**
-
-```bash
-npx nx dev @verichain-nexus/web
-npx nx serve api
-nx run contracts:compile
+npm run web      # Start frontend
+npm run api      # Start backend
+npm run dev      # Start both
 ```
 
 ### Build
 
-Build all apps:
 ```bash
 npm run build
 ```
 
-Build specific app:
-```bash
-npx nx build @verichain-nexus/web
-npx nx build api
-```
-
 ### Smart Contracts
 
-Navigate to contracts directory:
 ```bash
+npm run contracts:compile    # Compile contracts
 cd packages/contracts
+npm run test                 # Run contract tests
+npm run deploy               # Deploy contracts
 ```
 
-Compile contracts:
-```bash
-npm run compile
-```
+## Shared Types
 
-Run tests:
-```bash
-npm run test
-```
-
-Clean artifacts:
-```bash
-npm run clean
-```
-
-## Importing Shared Types
-
-Apps can import from the shared types package:
+Import from `packages/types`:
 
 ```typescript
-import { User, Transaction, Status } from '@verichain-nexus/types';
+import { Agent, User, Status } from '@verichain-nexus/types';
 ```
 
-## Project Graph
+## Nx Commands
 
-Visualize project dependencies:
 ```bash
-npx nx graph
+npx nx graph                          # Visualize dependencies
+npx nx dev @verichain-nexus/web       # Start web
+npx nx serve api                      # Start api
+npx nx build @verichain-nexus/web     # Build web
+npx nx build api                      # Build api
 ```
 
 ## Tech Stack
