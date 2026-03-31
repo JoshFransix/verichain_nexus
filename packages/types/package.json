@@ -1,14 +1,14 @@
 {
-  "name": "@verichain-nexus/types",
-  "version": "1.0.0",
-  "description": "Shared TypeScript types for verichain-nexus",
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
-  "scripts": {
-    "build": "tsc",
-    "typecheck": "tsc --noEmit"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+    "name": "@verichain-nexus/types",
+    "version": "1.0.0",
+    "description": "Shared TypeScript types for verichain-nexus",
+    "main": "./src/index.ts",
+    "types": "./src/index.ts",
+    "scripts": {
+        "build": "tsc",
+        "typecheck": "tsc --noEmit"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC"
 }

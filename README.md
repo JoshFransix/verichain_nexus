@@ -1,52 +1,106 @@
-# VerichainNexus
+# VeriChain Nexus
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+A clean, scalable Nx monorepo for blockchain development with Next.js, NestJS, and Hardhat.
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
-
-[Learn more about this workspace setup and its capabilities](https://nx.dev/nx-api/js?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
-
-## Generate a library
-
-```sh
-npx nx g @nx/js:lib packages/pkg1 --publishable --importPath=@my-org/pkg1
-```
-
-## Run tasks
-
-To build the library use:
-
-```sh
-npx nx build pkg1
-```
-
-To run any task with Nx use:
-
-```sh
-npx nx <target> <project-name>
-```
-
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
-
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Versioning and releasing
-
-To version and release the library use
+## Structure
 
 ```
-npx nx release
+verichain-nexus/
+├── apps/
+│   ├── web/           # Next.js frontend (App Router, TypeScript)
+│   ├── api/           # NestJS backend (TypeScript)
+│   ├── web-e2e/       # E2E tests for web
+│   └── api-e2e/       # E2E tests for api
+├── packages/
+│   ├── contracts/     # Solidity smart contracts (Hardhat)
+│   └── types/         # Shared TypeScript types
+└── nx.json            # Nx workspace configuration
 ```
 
-Pass `--dry-run` to see what would happen without actually releasing the library.
+## Quick Start
 
-[Learn more about Nx release &raquo;](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+### Install Dependencies
 
-## Keep TypeScript project references up to date
+```bash
+npm install
+```
 
-Nx automatically updates TypeScript [project references](https://www.typescriptlang.org/docs/handbook/project-references.html) in `tsconfig.json` files to ensure they remain accurate based on your project dependencies (`import` or `require` statements). This sync is automatically done when running tasks such as `build` or `typecheck`, which require updated references to function correctly.
+### Development
 
-To manually trigger the process to sync the project graph dependencies information to the TypeScript project references, run the following command:
+Run the Next.js frontend:
+```bash
+npx nx dev @verichain-nexus/web
+```
+
+Run the NestJS backend:
+```bash
+npx nx serve api
+```
+
+Compile smart contracts:
+```bash
+cd packages/contracts
+npm run compile
+```
+
+### Build
+
+Build all apps:
+```bash
+npx nx run-many --target=build
+```
+
+Build specific app:
+```bash
+npx nx build @verichain-nexus/web
+npx nx build api
+```
+
+### Smart Contracts
+
+Navigate to contracts directory:
+```bash
+cd packages/contracts
+```
+
+Compile contracts:
+```bash
+npm run compile
+```
+
+Run tests:
+```bash
+npm run test
+```
+
+Clean artifacts:
+```bash
+npm run clean
+```
+
+## Importing Shared Types
+
+Apps can import from the shared types package:
+
+```typescript
+import { User, Transaction, Status } from '@verichain-nexus/types';
+```
+
+## Project Graph
+
+Visualize project dependencies:
+```bash
+npx nx graph
+```
+
+## Tech Stack
+
+- **Nx** - Monorepo tool
+- **Next.js 16** - Frontend framework with App Router
+- **NestJS** - Backend framework
+- **Hardhat** - Smart contract development
+- **TypeScript** - Type safety across all projects
+- **Prettier** - Code formatting
 
 ```sh
 npx nx sync

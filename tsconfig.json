@@ -4,16 +4,13 @@
   "files": [],
   "references": [
     {
-      "path": "./web-e2e"
-    },
-    {
-      "path": "./web"
-    },
-    {
       "path": "./apps/api-e2e"
     },
     {
       "path": "./apps/api"
+    },
+    {
+      "path": "./apps/web"
     }
   ]
 }

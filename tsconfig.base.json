@@ -5,7 +5,9 @@
     "emitDeclarationOnly": true,
     "importHelpers": true,
     "isolatedModules": true,
-    "lib": ["es2022"],
+    "lib": [
+      "es2022"
+    ],
     "module": "nodenext",
     "moduleResolution": "nodenext",
     "noEmitOnError": true,
@@ -16,10 +18,16 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "es2022",
-    "customConditions": ["@verichain-nexus/source"],
+    "customConditions": [
+      "@verichain-nexus/source"
+    ],
     "paths": {
-      "@verichain-nexus/types": ["packages/types/src/index.ts"],
-      "@verichain-nexus/contracts": ["packages/contracts/index.ts"]
+      "@verichain-nexus/types": [
+        "packages/types/src/index.ts"
+      ],
+      "@verichain-nexus/contracts": [
+        "packages/contracts/index.ts"
+      ]
     }
   }
 }
