@@ -27,27 +27,35 @@ npm install
 
 ### Development
 
-Run the Next.js frontend:
+**Simple Commands:**
+
+```bash
+# Start Next.js frontend
+npm run web
+
+# Start NestJS backend
+npm run api
+
+# Start both frontend + backend together
+npm run dev
+
+# Compile smart contracts
+npm run contracts:compile
+```
+
+**Alternative (full Nx commands):**
+
 ```bash
 npx nx dev @verichain-nexus/web
-```
-
-Run the NestJS backend:
-```bash
 npx nx serve api
-```
-
-Compile smart contracts:
-```bash
-cd packages/contracts
-npm run compile
+nx run contracts:compile
 ```
 
 ### Build
 
 Build all apps:
 ```bash
-npx nx run-many --target=build
+npm run build
 ```
 
 Build specific app:

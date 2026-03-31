@@ -1,0 +1,29 @@
+{
+    "name": "contracts",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "packages/contracts",
+    "projectType": "library",
+    "targets": {
+        "compile": {
+            "executor": "nx:run-commands",
+            "options": {
+                "command": "npm run compile",
+                "cwd": "packages/contracts"
+            }
+        },
+        "test": {
+            "executor": "nx:run-commands",
+            "options": {
+                "command": "npm run test",
+                "cwd": "packages/contracts"
+            }
+        },
+        "clean": {
+            "executor": "nx:run-commands",
+            "options": {
+                "command": "npm run clean",
+                "cwd": "packages/contracts"
+            }
+        }
+    }
+}

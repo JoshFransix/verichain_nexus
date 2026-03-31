@@ -2,7 +2,14 @@
   "name": "@verichain-nexus/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "web": "nx dev @verichain-nexus/web",
+    "api": "nx serve api",
+    "dev": "nx run-many --target=serve --projects=api,@verichain-nexus/web --parallel",
+    "build": "nx run-many --target=build --all",
+    "contracts:compile": "nx run contracts:compile",
+    "graph": "nx graph"
+  },
   "private": true,
   "devDependencies": {
     "@nestjs/schematics": "^11.0.0",
