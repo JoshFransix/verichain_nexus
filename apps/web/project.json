@@ -10,7 +10,9 @@
     "targets": {
         "build": {
             "executor": "@nx/next:build",
-            "outputs": ["{options.outputPath}"],
+            "outputs": [
+                "{options.outputPath}"
+            ],
             "options": {
                 "outputPath": "apps/web/.next"
             }
