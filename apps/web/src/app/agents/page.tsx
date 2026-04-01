@@ -1,6 +1,8 @@
 'use client'
 
+import { useEffect } from 'react'
 import { useReadContract } from 'wagmi'
+import { toast } from 'sonner'
 import { AgentList } from '@/components/agents/agent-list'
 import { agentRegistryContract } from '@/lib/web3/contract'
 import type { Agent } from '@/lib/types'
@@ -35,6 +37,14 @@ export default function AgentsPage() {
     functionName: 'getActiveAgents',
   })
 
+  useEffect(() => {
+    if (isError) {
+      toast.error('Failed to load agents', {
+        description: 'Make sure your wallet is connected to Sepolia.',
+      })
+    }
+  }, [isError])
+
   const agents: Agent[] = data ? mapAgents(data as ContractAgent[]) : []
 
   return (
@@ -46,14 +56,7 @@ export default function AgentsPage() {
         </p>
       </div>
 
-      {isError ? (
-        <div className="text-center py-12">
-          <p className="text-destructive font-medium">Failed to load agents from contract.</p>
-          <p className="text-muted-foreground text-sm mt-1">Make sure your wallet is connected to Sepolia.</p>
-        </div>
-      ) : (
-        <AgentList agents={agents} isLoading={isLoading} />
-      )}
+      <AgentList agents={agents} isLoading={isLoading} />
     </div>
   )
 }

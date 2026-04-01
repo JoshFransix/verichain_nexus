@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { useWriteContract, useWaitForTransactionReceipt, useChainId, useSwitchChain } from 'wagmi'
 import { sepolia } from 'wagmi/chains'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -31,9 +32,32 @@ export function AgentRegistrationForm() {
 
   useEffect(() => {
     if (isSuccess) {
+      toast.success('Agent registered successfully!')
       router.push('/agents')
     }
   }, [isSuccess, router])
+
+  useEffect(() => {
+    if (hash && !isSuccess) {
+      toast.info('Transaction submitted', {
+        description: hash,
+        duration: 8000,
+      })
+    }
+  }, [hash])
+
+  useEffect(() => {
+    if (!error) return
+    const msg = error.message.includes('User rejected') || error.message.includes('user rejected')
+      ? 'Transaction rejected in wallet.'
+      : (() => {
+          const reasonMatch = error.message.match(/following reason:\s*\n([^\n]+)/)
+          if (reasonMatch) return reasonMatch[1].trim()
+          const firstLine = error.message.split('\n').find(l => l.trim())
+          return firstLine ?? error.message
+        })()
+    toast.error(msg)
+  }, [error])
 
   // Once chain switches to Sepolia, auto-submit if user was waiting
   useEffect(() => {
@@ -86,25 +110,13 @@ export function AgentRegistrationForm() {
 
     if (isWrongNetwork) {
       setPendingSubmit(true)
+      toast.warning('Switching to Sepolia testnet...')
       switchChain({ chainId: sepolia.id })
       return
     }
 
     submitToContract()
   }
-
-  const errorMessage = error
-    ? (error.message.includes('User rejected') || error.message.includes('user rejected')
-        ? 'Transaction rejected in wallet.'
-        : (() => {
-            // wagmi wraps the revert reason — extract it from 'reverted with the following reason:\n<reason>'
-            const reasonMatch = error.message.match(/following reason:\s*\n([^\n]+)/)
-            if (reasonMatch) return reasonMatch[1].trim()
-            // fallback: first non-empty line
-            const firstLine = error.message.split('\n').find(l => l.trim())
-            return firstLine ?? error.message
-          })())
-    : null
 
   const buttonLabel = isSwitching
     ? 'Switching Network...'
@@ -127,11 +139,6 @@ export function AgentRegistrationForm() {
       
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
-          {isWrongNetwork && (
-            <div className="rounded-md border border-yellow-500/50 bg-yellow-500/10 px-4 py-3 text-sm text-yellow-500">
-              You are on the wrong network. Click Register to switch to Sepolia.
-            </div>
-          )}
           <Input
             label="Agent Name"
             placeholder="My AI Assistant"
@@ -183,15 +190,6 @@ export function AgentRegistrationForm() {
             {buttonLabel}
           </Button>
 
-          {errorMessage && (
-            <p className="text-sm text-destructive mt-2">{errorMessage}</p>
-          )}
-
-          {hash && !isSuccess && (
-            <p className="text-sm text-muted-foreground mt-2 font-mono break-all">
-              Tx: {hash}
-            </p>
-          )}
         </form>
       </CardContent>
     </Card>

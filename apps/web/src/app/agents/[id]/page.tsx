@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useParams } from 'next/navigation'
+import { toast } from 'sonner'
 import { useReadContract } from 'wagmi'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -16,7 +17,7 @@ export default function AgentDetailPage() {
   const params = useParams()
   const agentId = BigInt(params.id as string)
   const [prompt, setPrompt] = useState('')
-  const [response, setResponse] = useState<{ ok: boolean; body: string } | null>(null)
+  const [response, setResponse] = useState<string | null>(null)
   const [isInteracting, setIsInteracting] = useState(false)
 
   const { data, isLoading, isError } = useReadContract({
@@ -38,10 +39,14 @@ export default function AgentDetailPage() {
         body: JSON.stringify({ prompt }),
       })
       const body = await res.text()
-      setResponse({ ok: res.ok, body })
+      if (!res.ok) {
+        toast.error('Agent returned an error', { description: body })
+      } else {
+        setResponse(body)
+      }
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Unknown error'
-      setResponse({ ok: false, body: `Failed to reach agent endpoint: ${message}` })
+      toast.error('Failed to reach agent endpoint', { description: message })
     } finally {
       setIsInteracting(false)
     }
@@ -183,9 +188,9 @@ export default function AgentDetailPage() {
           </div>
 
           {response && (
-            <div className={`p-4 rounded-md border ${response.ok ? 'bg-muted border-border' : 'bg-destructive/10 border-destructive/50'}`}>
+            <div className="p-4 rounded-md border bg-muted border-border">
               <div className="flex items-center justify-between mb-2">
-                <h4 className="font-medium text-sm">{response.ok ? 'Response' : 'Error'}</h4>
+                <h4 className="font-medium text-sm">Response</h4>
                 <button
                   onClick={() => { setResponse(null); setPrompt('') }}
                   className="text-xs text-muted-foreground hover:text-foreground transition-colors"
@@ -193,8 +198,8 @@ export default function AgentDetailPage() {
                   Clear
                 </button>
               </div>
-              <p className={`text-sm whitespace-pre-wrap font-mono ${!response.ok ? 'text-destructive' : ''}`}>
-                {response.body}
+              <p className="text-sm whitespace-pre-wrap font-mono">
+                {response}
               </p>
             </div>
           )}

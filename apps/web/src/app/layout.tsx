@@ -3,6 +3,7 @@
 import './global.css'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { WagmiProvider } from 'wagmi'
+import { Toaster } from 'sonner'
 import { config } from '@/lib/web3/config'
 import { Header } from '@/components/layout/header'
 import { useState } from 'react'
@@ -25,6 +26,7 @@ export default function RootLayout({
                 {children}
               </main>
             </div>
+            <Toaster theme="dark" richColors position="top-right" closeButton />
           </QueryClientProvider>
         </WagmiProvider>
       </body>
