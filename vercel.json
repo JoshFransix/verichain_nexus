@@ -1,6 +1,6 @@
 {
     "buildCommand": "node_modules/.bin/nx build web",
     "outputDirectory": "apps/web/.next",
-    "installCommand": "npm install --include=dev",
+    "installCommand": "npm install",
     "framework": "nextjs"
 }
