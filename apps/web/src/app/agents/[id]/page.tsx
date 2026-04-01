@@ -2,64 +2,77 @@
 
 import { useState } from 'react'
 import { useParams } from 'next/navigation'
+import { useReadContract } from 'wagmi'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { formatCapabilities, truncateAddress } from '@/lib/utils'
-import { ExternalLink, Play, Send } from 'lucide-react'
+import { truncateAddress } from '@/lib/utils'
+import { ExternalLink, Send } from 'lucide-react'
+import { agentRegistryContract } from '@/lib/web3/contract'
 import type { Agent } from '@/lib/types'
-
-// Mock agent data - in real app, fetch from contract
-const mockAgents: Record<string, Agent> = {
-  '1': {
-    id: 1n,
-    name: 'CodeReviewer AI',
-    description: 'Advanced AI agent that provides comprehensive code reviews, security analysis, and optimization suggestions. Built with state-of-the-art language models and trained on millions of code repositories.',
-    endpoint: 'https://api.codereview.ai/v1',
-    capabilities: ['code-review', 'security-analysis', 'optimization', 'bug-detection'],
-    owner: '0x742d35cc6544953d9c000b5b85eb3e8e5e1e0e26',
-    isActive: true,
-  },
-  '2': {
-    id: 2n,
-    name: 'TextGen Pro',
-    description: 'Professional text generation agent for creating high-quality content, documentation, and creative writing.',
-    endpoint: 'https://api.textgen.pro/v2',
-    capabilities: ['text-generation', 'content-creation', 'documentation'],
-    owner: '0x8ba1f109551bD432803012645Hac136c9969B7A',
-    isActive: true,
-  },
-}
 
 export default function AgentDetailPage() {
   const params = useParams()
-  const agentId = params.id as string
+  const agentId = BigInt(params.id as string)
   const [prompt, setPrompt] = useState('')
   const [response, setResponse] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  
-  const agent = mockAgents[agentId]
+  const [isInteracting, setIsInteracting] = useState(false)
 
-  if (!agent) {
+  const { data, isLoading, isError } = useReadContract({
+    ...agentRegistryContract,
+    functionName: 'getAgentById',
+    args: [agentId],
+  })
+
+  const agent = data as Agent | undefined
+
+  const handleRunAgent = async () => {
+    if (!prompt.trim() || !agent) return
+    setIsInteracting(true)
+    try {
+      const res = await fetch(agent.endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt }),
+      })
+      const text = await res.text()
+      setResponse(text)
+    } catch {
+      setResponse('Failed to reach agent endpoint.')
+    } finally {
+      setIsInteracting(false)
+    }
+  }
+
+  if (isLoading) {
     return (
-      <div className="text-center py-12">
-        <h1 className="text-2xl font-bold text-muted-foreground">Agent Not Found</h1>
-        <p className="text-muted-foreground mt-2">The requested agent does not exist.</p>
+      <div className="max-w-4xl mx-auto space-y-6 animate-pulse">
+        <div className="space-y-3">
+          <div className="h-8 bg-muted rounded w-1/3" />
+          <div className="h-4 bg-muted rounded w-2/3" />
+        </div>
+        <div className="grid md:grid-cols-3 gap-6">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="border border-border rounded-lg p-6 space-y-3">
+              <div className="h-3 bg-muted rounded w-1/2" />
+              <div className="h-4 bg-muted rounded w-3/4" />
+            </div>
+          ))}
+        </div>
       </div>
     )
   }
 
-  const handleRunAgent = async () => {
-    if (!prompt.trim()) return
-    
-    setIsLoading(true)
-    
-    // Mock API call - replace with actual agent endpoint call
-    setTimeout(() => {
-      setResponse(`Mock response from ${agent.name}: I've analyzed your input "${prompt}" and here's my response. This is a simulated interaction for demo purposes.`)
-      setIsLoading(false)
-    }, 2000)
+  if (isError || !agent) {
+    return (
+      <div className="text-center py-12">
+        <h1 className="text-2xl font-bold">Agent Not Found</h1>
+        <p className="text-muted-foreground mt-2">
+          This agent does not exist or could not be loaded.
+        </p>
+      </div>
+    )
   }
 
   return (
@@ -72,7 +85,7 @@ export default function AgentDetailPage() {
           </div>
           <p className="text-muted-foreground">{agent.description}</p>
         </div>
-        
+
         <Button
           variant="ghost"
           size="sm"
@@ -146,19 +159,22 @@ export default function AgentDetailPage() {
             />
             <Button
               onClick={handleRunAgent}
-              disabled={!prompt.trim() || isLoading}
-              isLoading={isLoading}
+              disabled={!prompt.trim() || isInteracting || !agent.isActive}
+              isLoading={isInteracting}
               className="flex items-center space-x-2"
             >
               <Send className="h-4 w-4" />
               <span>Send</span>
             </Button>
+            {!agent.isActive && (
+              <p className="text-sm text-muted-foreground">This agent is inactive and cannot receive prompts.</p>
+            )}
           </div>
 
           {response && (
             <div className="p-4 bg-muted rounded-md">
               <h4 className="font-medium mb-2">Response:</h4>
-              <p className="text-sm">{response}</p>
+              <p className="text-sm whitespace-pre-wrap">{response}</p>
             </div>
           )}
         </CardContent>
