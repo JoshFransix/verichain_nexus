@@ -3,7 +3,7 @@
 import './global.css'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { WagmiProvider } from 'wagmi'
-import { config } from '@/lib/web3'
+import { config } from '@/lib/web3/config'
 import { Header } from '@/components/layout/header'
 import { useState } from 'react'
 

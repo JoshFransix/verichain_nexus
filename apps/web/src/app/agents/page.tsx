@@ -2,7 +2,7 @@
 
 import { useReadContract } from 'wagmi'
 import { AgentList } from '@/components/agents/agent-list'
-import { AGENT_REGISTRY_ABI, CONTRACT_ADDRESS } from '@/lib/web3'
+import { AGENT_REGISTRY_ABI, CONTRACT_ADDRESS } from '@/lib/web3/contract'
 import type { Agent } from '@/lib/types'
 
 export default function AgentsPage() {

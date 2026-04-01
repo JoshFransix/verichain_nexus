@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { parseCapabilities } from '@/lib/utils'
-import { AGENT_REGISTRY_ABI, CONTRACT_ADDRESS } from '@/lib/web3'
+import { AGENT_REGISTRY_ABI, CONTRACT_ADDRESS } from '@/lib/web3/contract'
 import type { AgentInput } from '@/lib/types'
 
 export function AgentRegistrationForm() {
