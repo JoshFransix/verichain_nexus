@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useWriteContract, useWaitForTransactionReceipt, useChainId, useSwitchChain } from 'wagmi'
 import { sepolia } from 'wagmi/chains'
@@ -21,6 +21,7 @@ export function AgentRegistrationForm() {
   })
   const [capabilitiesInput, setCapabilitiesInput] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [pendingSubmit, setPendingSubmit] = useState(false)
 
   const { writeContract, data: hash, error, isPending, reset } = useWriteContract()
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash })
@@ -33,6 +34,28 @@ export function AgentRegistrationForm() {
       router.push('/agents')
     }
   }, [isSuccess, router])
+
+  // Once chain switches to Sepolia, auto-submit if user was waiting
+  useEffect(() => {
+    if (pendingSubmit && !isWrongNetwork) {
+      setPendingSubmit(false)
+      submitToContract()
+    }
+  }, [chainId]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const submitToContract = useCallback(() => {
+    writeContract({
+      ...agentRegistryContract,
+      functionName: 'registerAgent',
+      chainId: sepolia.id,
+      args: [
+        formData.name,
+        formData.description,
+        formData.endpoint,
+        parseCapabilities(capabilitiesInput),
+      ],
+    })
+  }, [writeContract, formData, capabilitiesInput])
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {}
@@ -59,23 +82,15 @@ export function AgentRegistrationForm() {
     e.preventDefault()
     reset()
 
+    if (!validateForm()) return
+
     if (isWrongNetwork) {
+      setPendingSubmit(true)
       switchChain({ chainId: sepolia.id })
       return
     }
 
-    if (!validateForm()) return
-
-    writeContract({
-      ...agentRegistryContract,
-      functionName: 'registerAgent',
-      args: [
-        formData.name,
-        formData.description,
-        formData.endpoint,
-        parseCapabilities(capabilitiesInput),
-      ],
-    })
+    submitToContract()
   }
 
   const errorMessage = error
