@@ -2,47 +2,40 @@
 
 import { useReadContract } from 'wagmi'
 import { AgentList } from '@/components/agents/agent-list'
-import { AGENT_REGISTRY_ABI, CONTRACT_ADDRESS } from '@/lib/web3/contract'
+import { agentRegistryContract } from '@/lib/web3/contract'
 import type { Agent } from '@/lib/types'
 
+type ContractAgent = {
+  id: bigint
+  name: string
+  description: string
+  endpoint: string
+  capabilities: string[]
+  owner: `0x${string}`
+  isActive: boolean
+  createdAt: bigint
+}
+
+function mapAgents(data: readonly ContractAgent[]): Agent[] {
+  return data.map((a) => ({
+    id: a.id,
+    name: a.name,
+    description: a.description,
+    endpoint: a.endpoint,
+    capabilities: [...a.capabilities],
+    owner: a.owner,
+    isActive: a.isActive,
+    createdAt: a.createdAt,
+  }))
+}
+
 export default function AgentsPage() {
-  const { data: agentCount = 0n, isLoading: isLoadingCount } = useReadContract({
-    address: CONTRACT_ADDRESS,
-    abi: AGENT_REGISTRY_ABI,
-    functionName: 'agentCount',
+  const { data, isLoading, isError } = useReadContract({
+    ...agentRegistryContract,
+    functionName: 'getActiveAgents',
   })
 
-  // For demo purposes, let's create some mock agents
-  // In a real app, you'd fetch these from the contract
-  const mockAgents: Agent[] = [
-    {
-      id: 1n,
-      name: 'CodeReviewer AI',
-      description: 'Advanced AI agent that provides comprehensive code reviews, security analysis, and optimization suggestions.',
-      endpoint: 'https://api.codereview.ai/v1',
-      capabilities: ['code-review', 'security-analysis', 'optimization'],
-      owner: '0x742d35cc6544953d9c000b5b85eb3e8e5e1e0e26',
-      isActive: true,
-    },
-    {
-      id: 2n,
-      name: 'TextGen Pro',
-      description: 'Professional text generation agent for creating high-quality content, documentation, and creative writing.',
-      endpoint: 'https://api.textgen.pro/v2',
-      capabilities: ['text-generation', 'content-creation', 'documentation'],
-      owner: '0x8ba1f109551bD432803012645Hac136c9969B7A',
-      isActive: true,
-    },
-    {
-      id: 3n,
-      name: 'ImageAnalyzer',
-      description: 'Powerful image analysis agent capable of object detection, classification, and visual understanding.',
-      endpoint: 'https://vision.imageanalyzer.com/api',
-      capabilities: ['image-analysis', 'object-detection', 'classification'],
-      owner: '0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f',
-      isActive: false,
-    },
-  ]
+  const agents: Agent[] = data ? mapAgents(data as ContractAgent[]) : []
 
   return (
     <div className="space-y-6">
@@ -52,11 +45,15 @@ export default function AgentsPage() {
           Discover and interact with verified AI agents on the blockchain
         </p>
       </div>
-      
-      <AgentList 
-        agents={mockAgents} 
-        isLoading={isLoadingCount}
-      />
+
+      {isError ? (
+        <div className="text-center py-12">
+          <p className="text-destructive font-medium">Failed to load agents from contract.</p>
+          <p className="text-muted-foreground text-sm mt-1">Make sure your wallet is connected to Sepolia.</p>
+        </div>
+      ) : (
+        <AgentList agents={agents} isLoading={isLoading} />
+      )}
     </div>
   )
 }

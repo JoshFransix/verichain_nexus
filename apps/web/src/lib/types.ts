@@ -4,8 +4,9 @@ export interface Agent {
   description: string
   endpoint: string
   capabilities: string[]
-  owner: string
+  owner: `0x${string}`
   isActive: boolean
+  createdAt: bigint
 }
 
 export interface AgentInput {
