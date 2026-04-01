@@ -16,7 +16,7 @@ export default function AgentDetailPage() {
   const params = useParams()
   const agentId = BigInt(params.id as string)
   const [prompt, setPrompt] = useState('')
-  const [response, setResponse] = useState('')
+  const [response, setResponse] = useState<{ ok: boolean; body: string } | null>(null)
   const [isInteracting, setIsInteracting] = useState(false)
 
   const { data, isLoading, isError } = useReadContract({
@@ -30,18 +30,27 @@ export default function AgentDetailPage() {
   const handleRunAgent = async () => {
     if (!prompt.trim() || !agent) return
     setIsInteracting(true)
+    setResponse(null)
     try {
       const res = await fetch(agent.endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt }),
       })
-      const text = await res.text()
-      setResponse(text)
-    } catch {
-      setResponse('Failed to reach agent endpoint.')
+      const body = await res.text()
+      setResponse({ ok: res.ok, body })
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Unknown error'
+      setResponse({ ok: false, body: `Failed to reach agent endpoint: ${message}` })
     } finally {
       setIsInteracting(false)
+    }
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleRunAgent()
     }
   }
 
@@ -156,6 +165,8 @@ export default function AgentDetailPage() {
               placeholder="Enter your prompt here..."
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
+              onKeyDown={handleKeyDown}
+              disabled={isInteracting}
             />
             <Button
               onClick={handleRunAgent}
@@ -164,7 +175,7 @@ export default function AgentDetailPage() {
               className="flex items-center space-x-2"
             >
               <Send className="h-4 w-4" />
-              <span>Send</span>
+              <span>{isInteracting ? 'Sending...' : 'Send'}</span>
             </Button>
             {!agent.isActive && (
               <p className="text-sm text-muted-foreground">This agent is inactive and cannot receive prompts.</p>
@@ -172,9 +183,19 @@ export default function AgentDetailPage() {
           </div>
 
           {response && (
-            <div className="p-4 bg-muted rounded-md">
-              <h4 className="font-medium mb-2">Response:</h4>
-              <p className="text-sm whitespace-pre-wrap">{response}</p>
+            <div className={`p-4 rounded-md border ${response.ok ? 'bg-muted border-border' : 'bg-destructive/10 border-destructive/50'}`}>
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="font-medium text-sm">{response.ok ? 'Response' : 'Error'}</h4>
+                <button
+                  onClick={() => { setResponse(null); setPrompt('') }}
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Clear
+                </button>
+              </div>
+              <p className={`text-sm whitespace-pre-wrap font-mono ${!response.ok ? 'text-destructive' : ''}`}>
+                {response.body}
+              </p>
             </div>
           )}
         </CardContent>

@@ -24,6 +24,12 @@ export function Header() {
             >
               Agents
             </Link>
+            <Link
+              href="/agents/mine"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              My Agents
+            </Link>
           </nav>
         </div>
 
