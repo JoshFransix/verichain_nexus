@@ -8,10 +8,10 @@ const { composePlugins, withNx } = require('@nx/next');
  **/
 const nextConfig = {
   nx: {},
+  // Disable the lockfile warning by removing redundant package-lock.json
+  // We'll use the workspace root package-lock.json instead
 };
 
-const plugins = [
-  withNx,
-];
+const plugins = [withNx];
 
 module.exports = composePlugins(...plugins)(nextConfig);

@@ -36,8 +36,8 @@
     "src/**/*.tsx",
     "src/**/*.js",
     "src/**/*.jsx",
-    "../web/.next/types/**/*.ts",
-    "../dist/web/.next/types/**/*.ts",
+    ".next/types/**/*.ts",
+    "dist/.next/types/**/*.ts",
     "next-env.d.ts"
   ],
   "exclude": [
